@@ -1,0 +1,139 @@
+
+/* =========================================
+   ALIS PADASIAN
+   Global Design Foundation
+   ========================================= */
+
+/* 1. Design tokens */
+
+:root {
+  /* Colour palette */
+  --color-background: #F7F4ED;
+  --color-surface: #FFFFFF;
+  --color-text: #202020;
+  --color-muted: #77736D;
+  --color-accent: #702D3A;
+  --color-gold: #A58A58;
+  --color-border: #DED9CF;
+
+  /* Typography */
+  --font-heading: "Libre Baskerville", Georgia, serif;
+  --font-body: "Source Serif 4", Georgia, serif;
+  --font-interface: "Inter", Arial, sans-serif;
+
+  /* Layout */
+  --content-width: 1180px;
+  --reading-width: 720px;
+
+  /* Spacing */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2.5rem;
+  --space-xl: 4rem;
+  --space-2xl: 6rem;
+}
+
+/* 2. Basic reset */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+/* 3. Typography */
+
+h1,
+h2,
+h3,
+h4 {
+  margin-top: 0;
+  color: var(--color-text);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+h2 {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+p {
+  margin-top: 0;
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+a:hover {
+  color: var(--color-text);
+}
+
+/* 4. Shared layout utilities */
+
+.container {
+  width: min(
+    calc(100% - 3rem),
+    var(--content-width)
+  );
+  margin-inline: auto;
+}
+
+.reading-width {
+  max-width: var(--reading-width);
+}
+
+/* 5. Interface typography */
+
+nav,
+button,
+.label,
+.metadata {
+  font-family: var(--font-interface);
+}
+
+.label {
+  color: var(--color-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* 6. Responsive adjustments */
+
+@media (max-width: 600px) {
+  body {
+    font-size: 16px;
+  }
+
+  .container {
+    width: min(
+      calc(100% - 2rem),
+      var(--content-width)
+    );
+  }
+}
