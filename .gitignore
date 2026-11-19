@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Astro generated files
+.astro/
+dist/
+
+# Environment variables and secrets
+.env
+.env.*
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# VS Code local history
+.history/
