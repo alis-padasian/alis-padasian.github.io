@@ -15,7 +15,7 @@ To update text, reviews, blog posts, or book details without touching code:
 
 1.  Visit [PagesCMS](https://pagescms.org/).
 2.  Log in with your GitHub account.
-3.  Select the lis-padasian/alis-padasian.github.io repository.
+3.  Select the alis-padasian/alis-padasian.github.io repository.
 4.  Use the intuitive editor interface to add or edit content across the five core collections (Books, Series, Behind the Stories, Reader Reviews, Announcements).
 5.  Click **Save**. This automatically commits the changes to GitHub and triggers the live site update.
 6.  *Local sync:* If you are working locally in VS Code, run git pull origin main to bring those content changes down to your computer.
