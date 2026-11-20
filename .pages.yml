@@ -1,0 +1,95 @@
+
+media:
+  - name: book_images
+    label: Book images
+    input: src/content/books/images
+    output: ./images
+    categories: [image]
+    extensions: [jpg, jpeg, png, webp]
+  - name: series_images
+    label: Series images
+    input: src/content/series/images
+    output: ./images
+    categories: [image]
+    extensions: [jpg, jpeg, png, webp]
+  - name: post_images
+    label: Behind the Stories images
+    input: src/content/posts/images
+    output: ./images
+    categories: [image]
+    extensions: [jpg, jpeg, png, webp]
+
+content:
+  - name: about
+    label: About Page
+    type: collection
+    path: src/content/about
+    fields:
+      - { name: biography, label: Biography, type: text, required: true }
+      - { name: storytellingVision, label: Storytelling Vision, type: text, required: true }
+      - name: themes
+        label: Recurring Themes
+        type: list
+        fields:
+          - { name: title, label: Title, type: string, required: true }
+          - { name: description, label: Description, type: text, required: true }
+          - { name: icon, label: Icon (e.g. i-mdi:history), type: string, required: true }
+      - { name: influences, label: Creative Influences, type: list, field: { type: string } }
+
+  - name: books
+    label: Books
+    type: collection
+    path: src/content/books
+    fields:
+      - { name: title, label: Title, type: string, required: true }
+      - { name: tagline, label: Tagline, type: string }
+      - { name: description, label: Description, type: text, required: true }
+      - { name: publicationDate, label: Publication Date, type: datetime }
+      - { name: status, label: Status, type: select, options: [forthcoming, available, unavailable] }
+      - { name: cover, label: Cover Image, type: image, options: { media: book_images } }
+      - { name: coverAlt, label: Cover Alt Text, type: string }
+      - { name: genres, label: Genres, type: list, field: { type: string } }
+      - { name: formats, label: Formats, type: list, field: { type: select, options: [paperback, hardcover, ebook, audiobook] } }
+      - { name: seriesSlug, label: Series Slug, type: string }
+      - { name: seriesOrder, label: Series Order, type: number }
+      - { name: featured, label: Featured, type: boolean }
+      - { name: draft, label: Draft, type: boolean }
+
+  - name: posts
+    label: Behind the Stories
+    type: collection
+    path: src/content/posts
+    fields:
+      - { name: title, label: Title, type: string, required: true }
+      - { name: description, label: Description, type: text, required: true }
+      - { name: publishedAt, label: Published Date, type: datetime, required: true }
+      - { name: tags, label: Tags, type: list, field: { type: string } }
+      - { name: featured, label: Featured, type: boolean }
+      - { name: heroImage, label: Hero Image, type: image, options: { media: post_images } }
+      - { name: heroImageAlt, label: Hero Image Alt Text, type: string }
+      - { name: draft, label: Draft, type: boolean }
+
+  - name: reviews
+    label: Reader Reviews
+    type: collection
+    path: src/content/reviews
+    fields:
+      - { name: quote, label: Quote, type: text, required: true }
+      - { name: reviewerName, label: Reviewer Name, type: string }
+      - { name: bookSlug, label: Book Slug, type: string }
+      - { name: approved, label: Approved, type: boolean }
+      - { name: featured, label: Featured, type: boolean }
+      - { name: draft, label: Draft, type: boolean }
+
+  - name: announcements
+    label: Announcements
+    type: collection
+    path: src/content/announcements
+    fields:
+      - { name: title, label: Title, type: string, required: true }
+      - { name: description, label: Description, type: text, required: true }
+      - { name: type, label: Type, type: select, options: [release, update, exclusive-content] }
+      - { name: publishedAt, label: Published Date, type: datetime, required: true }
+      - { name: featured, label: Featured, type: boolean }
+      - { name: draft, label: Draft, type: boolean }
+

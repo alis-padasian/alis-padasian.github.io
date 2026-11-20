@@ -1,0 +1,187 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import { getPublicAnnouncements } from "../lib/announcements";
+
+const announcements = await getPublicAnnouncements();
+
+// Books are the "what's coming" promise, so surface the catalogue for series tracking.
+const books = (await getCollection("books", ({ data }) => !data.draft)).sort((a, b) => {
+  const dateA = a.data.publicationDate ? new Date(a.data.publicationDate).getTime() : 0;
+  const dateB = b.data.publicationDate ? new Date(b.data.publicationDate).getTime() : 0;
+  return dateB - dateA;
+});
+const series = await getCollection("series", ({ data }) => !data.draft);
+const seriesMap = new Map(series.map((entry) => [entry.id, entry.data.title]));
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+
+const typeLabels: Record<string, string> = {
+  release: "New Release",
+  update: "Series Update",
+  "exclusive-content": "Exclusive Content",
+};
+---
+
+<Layout
+  title="The Next Chapter"
+  description="Join the reader community for release announcements, exclusive excerpts, and series news from Alis Padasian."
+  schemaType="WebPage"
+>
+  <div class="page-stack space-y-10 sm:space-y-12">
+    <header class="page-header border-b border-paper-300/90 pb-6 dark:border-ink-700">
+      <h1 class="page-title text-4xl font-semibold tracking-tight text-ink-950 dark:text-paper-50 sm:text-5xl">
+        The Next Chapter
+      </h1>
+      <p class="page-description mt-3 max-w-2xl text-lg text-ink-700 dark:text-paper-300">
+        Every book ends, but the story keeps going. Subscribe for release announcements, early excerpts, and the notes I only share with readers who have walked the whole shore with me.
+      </p>
+    </header>
+
+    <!-- Newsletter Signup (The Return Engine) -->
+    <section aria-labelledby="newsletter-heading" class="rounded-2xl border border-accent-300/60 bg-accent-50/50 p-6 dark:border-accent-800/60 dark:bg-accent-950/30 sm:p-10">
+      <div class="grid gap-8 md:grid-cols-2 md:items-center">
+        <div class="space-y-3">
+          <span class="text-xs font-mono uppercase tracking-wider text-accent-700 dark:text-accent-400">
+            Reader Dispatch
+          </span>
+          <h2 id="newsletter-heading" class="text-2xl font-semibold text-ink-950 dark:text-paper-50 sm:text-3xl">
+            Get the Next Chapter First
+          </h2>
+          <p class="text-sm text-ink-700 dark:text-paper-300 sm:text-base">
+            One letter per release, never a spam folder. Each dispatch includes a chapter preview, the story behind one scene, and a first look at the cover before it goes public.
+          </p>
+          <ul class="m-0 list-none space-y-1.5 p-0 text-sm text-ink-700 dark:text-paper-300">
+            <li class="flex gap-2">
+              <span class="i-mdi:check-circle-outline mt-0.5 shrink-0 text-accent-600 dark:text-accent-400" aria-hidden="true"></span>
+              <span>Release dates before they appear on retailer pages</span>
+            </li>
+            <li class="flex gap-2">
+              <span class="i-mdi:check-circle-outline mt-0.5 shrink-0 text-accent-600 dark:text-accent-400" aria-hidden="true"></span>
+              <span>Bonus excerpts from the cutting-room floor</span>
+            </li>
+            <li class="flex gap-2">
+              <span class="i-mdi:check-circle-outline mt-0.5 shrink-0 text-accent-600 dark:text-accent-400" aria-hidden="true"></span>
+              <span>Series reading order, kept up to date as it grows</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="space-y-4 rounded-xl border border-paper-300/80 bg-paper-50/80 p-6 dark:border-ink-700 dark:bg-ink-900/60">
+          <h3 class="text-lg font-semibold text-ink-950 dark:text-paper-50">
+            Join the List
+          </h3>
+          <p class="text-sm text-ink-700 dark:text-paper-300">
+            Signups are opening shortly. Leave nothing behind, but bookmark this page, the signup form drops here first.
+          </p>
+          <p class="text-sm font-semibold text-accent-800 dark:text-accent-300">
+            Want to start the conversation now?
+          </p>
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <a
+              href="/readers"
+              class="action-link inline-flex items-center justify-center gap-2 rounded-lg bg-ink-900 px-5 py-3 text-sm font-semibold text-paper-50 no-underline transition-colors hover:bg-ink-800 dark:bg-paper-100 dark:text-ink-950 dark:hover:bg-paper-200"
+            >
+              Share a Review
+              <span class="i-mdi:arrow-right text-base" aria-hidden="true"></span>
+            </a>
+            <a
+              href="/books"
+              class="inline-flex items-center justify-center gap-2 rounded-lg border border-paper-400 px-5 py-3 text-sm font-semibold text-ink-800 no-underline transition-colors hover:bg-paper-200 dark:border-ink-600 dark:text-paper-200 dark:hover:bg-ink-800"
+            >
+              Read a Sample
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Announcements Timeline -->
+    <section aria-labelledby="announcements-heading" class="space-y-6">
+      <div class="flex items-center justify-between border-b border-paper-300/80 pb-3 dark:border-ink-700">
+        <h2 id="announcements-heading" class="text-xl font-semibold text-ink-950 dark:text-paper-50">
+          Latest Dispatches
+        </h2>
+        <span class="text-xs font-mono text-ink-600 dark:text-paper-400">
+          {announcements.length} {announcements.length === 1 ? "Update" : "Updates"}
+        </span>
+      </div>
+
+      {announcements.length === 0 ? (
+        <div class="surface-card rounded-xl border border-paper-300/80 bg-paper-50/60 p-8 text-center dark:border-ink-700 dark:bg-ink-900/60">
+          <p class="text-sm text-ink-700 dark:text-paper-300">
+            The next dispatch is being written. Release news will appear here the moment it is ready.
+          </p>
+        </div>
+      ) : (
+        <ol class="m-0 list-none space-y-4 p-0">
+          {announcements.map((announcement) => (
+            <li class="surface-card rounded-xl border border-paper-300/80 bg-paper-50/60 p-5 dark:border-ink-700 dark:bg-ink-900/60">
+              <div class="flex flex-wrap items-center gap-3 text-xs font-mono text-ink-600 dark:text-paper-400">
+                <span class="rounded bg-accent-100/70 px-2 py-0.5 font-semibold text-accent-800 dark:bg-accent-950/60 dark:text-accent-300">
+                  {typeLabels[announcement.data.type] ?? announcement.data.type}
+                </span>
+                <time datetime={announcement.data.publishedAt.toISOString()}>
+                  {formatDate(announcement.data.publishedAt)}
+                </time>
+                {announcement.data.featured && (
+                  <span class="text-accent-700 dark:text-accent-400">Featured</span>
+                )}
+              </div>
+              <h3 class="mt-2 text-lg font-semibold text-ink-950 dark:text-paper-50">
+                {announcement.data.title}
+              </h3>
+              <p class="mt-1 text-sm text-ink-700 dark:text-paper-300">
+                {announcement.data.description}
+              </p>
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
+
+    <!-- Series Tracker -->
+    {books.length > 0 && (
+      <section aria-labelledby="series-heading" class="space-y-6">
+        <div class="flex items-center justify-between border-b border-paper-300/80 pb-3 dark:border-ink-700">
+          <h2 id="series-heading" class="text-xl font-semibold text-ink-950 dark:text-paper-50">
+            Catch Up on the Series
+          </h2>
+          <a href="/books" class="text-xs font-mono text-accent-700 hover:underline dark:text-accent-300">
+            Full catalogue
+          </a>
+        </div>
+
+        <ul class="m-0 grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
+          {books.map((book) => (
+            <li class="surface-card rounded-xl border border-paper-300/80 bg-paper-50/60 p-5 dark:border-ink-700 dark:bg-ink-900/60">
+              {book.data.seriesSlug && (
+                <p class="m-0 font-mono text-[11px] font-semibold uppercase tracking-wider text-accent-700 dark:text-accent-300">
+                  {seriesMap.get(book.data.seriesSlug) ?? book.data.seriesSlug}
+                  {book.data.seriesOrder && ` · Book ${book.data.seriesOrder}`}
+                </p>
+              )}
+              <h3 class="mt-1 text-base font-semibold text-ink-950 dark:text-paper-50">
+                <a href={`/books/${book.id}`} class="no-underline text-inherit hover:text-accent-700 dark:hover:text-accent-300">
+                  {book.data.title}
+                </a>
+              </h3>
+              {book.data.publicationDate && (
+                <p class="m-0 mt-1 text-xs font-mono text-ink-600 dark:text-paper-400">
+                  {formatDate(new Date(book.data.publicationDate))}
+                </p>
+              )}
+              {book.data.status === "forthcoming" && (
+                <p class="m-0 mt-2 inline-block rounded bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800 dark:bg-amber-950/60 dark:text-amber-300">
+                  Coming Soon
+                </p>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+  </div>
+</Layout>
+

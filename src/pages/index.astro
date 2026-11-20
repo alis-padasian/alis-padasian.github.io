@@ -1,26 +1,190 @@
 ---
-import "../styles/global.css";
+import Layout from "../layouts/Layout.astro";
+import PostCard from "../components/PostCard.astro";
+import { getCollection } from "astro:content";
+import siteConfig from "../side.config";
+import { Image } from "astro:assets";
 
-const title = "Alis Padasian | Official Author Website";
+const showHero = siteConfig.homeBlocks.hero.enabled;
+const showPosts = siteConfig.homeBlocks.posts.enabled;
+
+const recentPosts = showPosts
+  ? (await getCollection("posts"))
+      .filter((post) => !post.data.draft)
+      .sort(
+        (a, b) =>
+          new Date(b.data.publishedAt).getTime() -
+          new Date(a.data.publishedAt).getTime(),
+      )
+      .slice(0, 3)
+  : [];
+const primaryPost = recentPosts.find((post) => post.data.featured) ?? recentPosts[0];
+const secondaryPosts = recentPosts.filter((post) => post.id !== primaryPost?.id);
+
+const rawProfileImage = siteConfig.hero.profileImage.trim();
+const profileImageUrl = /^https?:/i.test(rawProfileImage)
+  ? rawProfileImage
+  : rawProfileImage.startsWith("/")
+    ? rawProfileImage
+    : new URL(
+        rawProfileImage.startsWith(".")
+          ? rawProfileImage
+          : `../${rawProfileImage}`,
+        import.meta.url,
+      ).href;
+
+const about = {
+  name: siteConfig.author,
+  bio: siteConfig.hero.subheadline,
+  avatar: profileImageUrl,
+  socialLinks: siteConfig.socialLinks,
+};
+
+// Get affiliations and research interests from config
+const affiliations = siteConfig.affiliations || [];
+const researchInterests = siteConfig.researchInterests || [];
+const statusBadge = siteConfig.hero.statusBadge;
+const headline = siteConfig.hero.headline || about.name;
+const profileAlt = siteConfig.hero.profileAlt || about.name;
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&family=Source+Serif+4:wght@400;500;600;700&display=swap"
-      rel="stylesheet" />
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="description" content="Discover the atmospheric mysteries of Eleanor Vale." />
-    <title>{title}</title>
-  </head>
-  <body>
-    <main>
-      <h1>Alis Padasian</h1>
-      <p>Welcome to the world of Blackthorn Bay Mysteries.</p>
-    </main>
-  </body>
-</html>
+<Layout
+  title="Home"
+  description={siteConfig.hero.subheadline}
+  schemaType="ProfilePage"
+>
+  <div class="space-y-12 pb-2 sm:space-y-16 sm:pb-4">
+    {showHero && (
+      <section class="relative border-b border-paper-300/90 pb-9 pt-3 dark:border-ink-700 sm:pb-12 sm:pt-6">
+      <div class="relative grid gap-6 lg:grid-cols-[minmax(0,1fr)_13rem] lg:items-start lg:gap-x-14">
+        <div class="min-w-0 lg:col-start-1 lg:row-start-1">
+          <h1 class="max-w-4xl font-heading text-[clamp(2.5rem,6vw,4.5rem)] font-semibold leading-[1] tracking-[-0.035em] text-ink-950 dark:text-paper-50">
+            {about.name}
+          </h1>
+
+          {affiliations.length > 0 && (
+            <div class="mt-4">
+              <div class="space-y-1">
+                {affiliations.map((aff) => (
+                  <p class="text-base leading-7 text-ink-600 dark:text-paper-300">
+                    {aff.role}
+                    {aff.department && <span>, {aff.department}</span>}
+                    {aff.url ? (
+                      <a
+                        href={aff.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="ml-1 font-semibold text-accent-700 underline decoration-accent-300 underline-offset-4 transition-colors hover:text-accent-900 dark:text-accent-300 dark:decoration-accent-700 dark:hover:text-accent-100"
+                      >
+                        {aff.institution}
+                      </a>
+                    ) : (
+                      <span>, {aff.institution}</span>
+                    )}
+                  </p>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <aside class="flex w-full items-center gap-4 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:block" aria-label="Profile">
+          <div class="relative w-20 shrink-0 overflow-hidden rounded-xl border border-paper-300/90 bg-white/70 p-1.5 shadow-paper dark:border-ink-700 dark:bg-ink-900/70 sm:w-24 lg:w-full lg:p-2">
+            <Image
+              src={about.avatar}
+              alt={profileAlt}
+              width={siteConfig.hero.profileImageWidth || 160}
+              height={siteConfig.hero.profileImageHeight || 160}
+              layout="constrained"
+              fit="cover"
+              priority
+              class="aspect-square h-auto w-full rounded-lg object-cover"
+            />
+          </div>
+          {statusBadge && (
+            <div class="inline-flex items-center gap-1.5 rounded-md border border-accent-300/40 bg-accent-50/70 px-2.5 py-1 text-xs font-semibold text-accent-800 dark:border-accent-700/50 dark:bg-accent-950/40 dark:text-accent-200 lg:mt-4">
+              <span class="h-1.5 w-1.5 rounded-full bg-accent-500 animate-pulse" aria-hidden="true" />
+              <span>{statusBadge}</span>
+            </div>
+          )}
+        </aside>
+
+        <div class="min-w-0 lg:col-start-1 lg:row-start-2">
+          <p class="max-w-[38rem] font-heading text-[1.5rem] font-medium leading-[1.25] tracking-[-0.015em] text-ink-900 dark:text-paper-100 sm:text-[1.75rem]">
+            {headline}
+          </p>
+
+		  <div class="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
+            {about.socialLinks.map((link) => {
+              const opensNewTab = /^https?:/i.test(link.href);
+              return (
+                <a
+                  href={link.href}
+                  target={opensNewTab ? "_blank" : undefined}
+                  rel={opensNewTab ? "noopener noreferrer" : undefined}
+                  class="action-link px-0"
+                >
+                  <span class={`${link.icon} text-base`} aria-hidden="true" />
+                  <span>{link.label}</span>
+                  {opensNewTab && <span class="sr-only"> opens in a new tab</span>}
+                </a>
+              );
+            })}
+          </div>
+
+		  <p class="mt-5 max-w-[65ch] text-[1.0625rem] leading-7 text-ink-700 dark:text-paper-300">
+			{about.bio}
+		  </p>
+
+          {researchInterests.length > 0 && (
+            <div class="mt-6 border-t border-paper-300/80 pt-4 dark:border-ink-700/80" aria-label="Research interests">
+              <span class="sr-only">Research interests:</span>
+              <ul class="flex list-none flex-wrap gap-2 p-0 m-0">
+                {researchInterests.map((interest) => (
+                  <li class="meta-chip">
+                    <span class="h-1 w-1 rounded-full bg-accent-500" aria-hidden="true"></span>
+                    <span>{interest}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+      </section>
+    )}
+
+    <!-- Showcase removed -->
+
+
+    {showPosts && recentPosts.length > 0 && (
+      <section class="content-section" aria-labelledby="latest-posts">
+      <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 id="latest-posts" class="font-heading text-3xl font-semibold tracking-[-0.02em] text-ink-950 dark:text-paper-50 sm:text-4xl">
+            {siteConfig.homeBlocks.posts.title}
+          </h2>
+          {siteConfig.homeBlocks.posts.description && (
+            <p class="mt-1 text-sm text-ink-600 dark:text-paper-300">{siteConfig.homeBlocks.posts.description}</p>
+          )}
+        </div>
+        <a href="/posts" class="action-link self-start px-0 sm:self-auto">
+          Visit the archive
+          <span class="i-ph-arrow-right text-base" aria-hidden="true"></span>
+        </a>
+      </div>
+
+      {primaryPost && (
+        <div>
+          <PostCard post={primaryPost} variant="featured" />
+          {secondaryPosts.length > 0 && (
+            <div class="mt-8 grid gap-8 sm:grid-cols-2">
+              {secondaryPosts.map((post) => <PostCard post={post} />)}
+            </div>
+          )}
+        </div>
+      )}
+      </section>
+    )}
+  </div>
+</Layout>

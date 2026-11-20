@@ -1,0 +1,227 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import { getPublicReviews } from "../lib/reviews";
+
+const reviews = await getPublicReviews();
+
+// Map book slugs to titles so each quote can link back to the book it praises.
+const books = await getCollection("books", ({ data }) => !data.draft);
+const bookMap = new Map(books.map((book) => [book.id, book.data.title]));
+
+const featuredReview = reviews.find((review) => review.data.featured) ?? reviews[0];
+const remainingReviews = reviews.filter((review) => review.id !== featuredReview?.id);
+
+const formatDate = (date: Date | undefined) =>
+  date
+    ? date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : undefined;
+---
+
+<Layout
+  title="Readers' Corner"
+  description="Approved reader reviews, discussion prompts, and community feedback on the novels of Alis Padasian."
+  schemaType="CollectionPage"
+>
+  <div class="page-stack space-y-10 sm:space-y-12">
+    <header class="page-header border-b border-paper-300/90 pb-6 dark:border-ink-700">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 class="page-title text-4xl font-semibold tracking-tight text-ink-950 dark:text-paper-50 sm:text-5xl">
+            Readers' Corner
+          </h1>
+          <p class="page-description mt-3 max-w-2xl text-lg text-ink-700 dark:text-paper-300">
+            Words from the people who have walked the fog-bound streets of St. Jude. Every review here was shared with permission and approved before publication.
+          </p>
+        </div>
+        <div class="rounded-lg border border-paper-300/80 bg-paper-100/50 px-4 py-2 text-xs font-mono text-ink-700 dark:border-ink-700 dark:bg-ink-900/50 dark:text-paper-300">
+          <span>{reviews.length} {reviews.length === 1 ? "Review" : "Reviews"}</span>
+        </div>
+      </div>
+    </header>
+
+    {featuredReview && (
+      <section aria-labelledby="featured-review-heading">
+        <h2 id="featured-review-heading" class="sr-only">Featured review</h2>
+        <figure class="surface-card rounded-2xl border border-paper-300/90 bg-paper-50/70 p-6 dark:border-ink-700 dark:bg-ink-900/70 sm:p-8">
+          <span class="i-mdi:format-quote-open text-3xl text-accent-600 dark:text-accent-400" aria-hidden="true"></span>
+          <blockquote class="mt-2 border-0 p-0">
+            <p class="text-xl leading-relaxed text-ink-900 dark:text-paper-100 sm:text-2xl">
+              {featuredReview.data.quote}
+            </p>
+          </blockquote>
+          <figcaption class="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-mono text-ink-600 dark:text-paper-400">
+            {featuredReview.data.reviewerName && (
+              <span class="font-semibold text-ink-900 dark:text-paper-100">
+                {featuredReview.data.reviewerName}
+              </span>
+            )}
+            {featuredReview.data.bookSlug && bookMap.get(featuredReview.data.bookSlug) && (
+              <>
+                <span aria-hidden="true">•</span>
+                <a
+                  href={`/books/${featuredReview.data.bookSlug}`}
+                  class="text-accent-700 hover:underline dark:text-accent-300"
+                >
+                  {bookMap.get(featuredReview.data.bookSlug)}
+                </a>
+              </>
+            )}
+            {formatDate(featuredReview.data.reviewDate) && (
+              <>
+                <span aria-hidden="true">•</span>
+                <time datetime={featuredReview.data.reviewDate?.toISOString()}>
+                  {formatDate(featuredReview.data.reviewDate)}
+                </time>
+              </>
+            )}
+            {featuredReview.data.source && (
+              <>
+                <span aria-hidden="true">•</span>
+                <a
+                  href={featuredReview.data.source.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-accent-700 hover:underline dark:text-accent-300"
+                >
+                  {featuredReview.data.source.label}
+                </a>
+              </>
+            )}
+          </figcaption>
+        </figure>
+      </section>
+    )}
+
+    <!-- Review Grid -->
+    <section aria-labelledby="all-reviews-heading" class="space-y-6">
+      <div class="flex items-center justify-between border-b border-paper-300/80 pb-3 dark:border-ink-700">
+        <h2 id="all-reviews-heading" class="text-xl font-semibold text-ink-950 dark:text-paper-50">
+          What Readers Are Saying
+        </h2>
+        <span class="text-xs font-mono text-ink-600 dark:text-paper-400">
+          {remainingReviews.length} {remainingReviews.length === 1 ? "Quote" : "Quotes"}
+        </span>
+      </div>
+
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {remainingReviews.length === 0 && (
+          <div class="surface-card rounded-xl border border-paper-300/80 bg-paper-50/60 p-8 text-center dark:border-ink-700 dark:bg-ink-900/60 sm:col-span-2 lg:col-span-3">
+            <p class="text-sm text-ink-700 dark:text-paper-300">
+              More reader reactions are on their way as new reviews are approved.
+            </p>
+          </div>
+        )}
+
+        {remainingReviews.map((review) => (
+          <article class="surface-card flex flex-col justify-between rounded-xl border border-paper-300/80 bg-paper-50/60 p-5 dark:border-ink-700 dark:bg-ink-900/60">
+            <div>
+              <span class="i-mdi:format-quote-open text-xl text-accent-600 dark:text-accent-400" aria-hidden="true"></span>
+              <blockquote class="mt-2 border-0 p-0">
+                <p class="text-sm leading-relaxed text-ink-800 dark:text-paper-200">
+                  {review.data.quote}
+                </p>
+              </blockquote>
+            </div>
+
+            <footer class="mt-5 border-t border-paper-200 pt-3 text-xs font-mono text-ink-600 dark:border-ink-800 dark:text-paper-400">
+              {review.data.reviewerName && (
+                <p class="m-0 font-semibold text-ink-900 dark:text-paper-100">
+                  {review.data.reviewerName}
+                </p>
+              )}
+              <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                {review.data.bookSlug && bookMap.get(review.data.bookSlug) && (
+                  <a
+                    href={`/books/${review.data.bookSlug}`}
+                    class="text-accent-700 hover:underline dark:text-accent-300"
+                  >
+                    {bookMap.get(review.data.bookSlug)}
+                  </a>
+                )}
+                {formatDate(review.data.reviewDate) && (
+                  <>
+                    <span aria-hidden="true">•</span>
+                    <time datetime={review.data.reviewDate?.toISOString()}>
+                      {formatDate(review.data.reviewDate)}
+                    </time>
+                  </>
+                )}
+                {review.data.source && (
+                  <>
+                    <span aria-hidden="true">•</span>
+                    <a
+                      href={review.data.source.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-accent-700 hover:underline dark:text-accent-300"
+                    >
+                      {review.data.source.label}
+                    </a>
+                  </>
+                )}
+              </div>
+            </footer>
+          </article>
+        ))}
+      </div>
+    </section>
+    <!-- Discussion Prompts & Conversion Bridge -->
+    <section class="rounded-2xl border border-paper-300/80 bg-paper-100/60 p-6 dark:border-ink-700 dark:bg-ink-900/60 sm:p-10">
+      <div class="grid gap-8 md:grid-cols-2 md:items-start">
+        <div class="space-y-3">
+          <span class="text-xs font-mono uppercase tracking-wider text-accent-700 dark:text-accent-400">
+            Book Club &amp; Discussion
+          </span>
+          <h2 class="text-2xl font-semibold text-ink-950 dark:text-paper-50 sm:text-3xl">
+            Questions for Your Reading Group
+          </h2>
+          <ul class="m-0 list-none space-y-2 p-0 text-sm text-ink-700 dark:text-paper-300">
+            <li class="flex gap-2">
+              <span class="i-mdi:comment-question-outline mt-0.5 shrink-0 text-accent-600 dark:text-accent-400" aria-hidden="true"></span>
+              <span>Which secrets in St. Jude felt most dangerous to keep, and why?</span>
+            </li>
+            <li class="flex gap-2">
+              <span class="i-mdi:comment-question-outline mt-0.5 shrink-0 text-accent-600 dark:text-accent-400" aria-hidden="true"></span>
+              <span>How does the tide itself function as an antagonist in the story?</span>
+            </li>
+            <li class="flex gap-2">
+              <span class="i-mdi:comment-question-outline mt-0.5 shrink-0 text-accent-600 dark:text-accent-400" aria-hidden="true"></span>
+              <span>Did Maeve make the right choice when the archive finally opened?</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="space-y-4 md:border-l md:border-paper-300/80 md:pl-8 dark:md:border-ink-700">
+          <h3 class="text-lg font-semibold text-ink-950 dark:text-paper-50">
+            Share Your Own Reaction
+          </h3>
+          <p class="text-sm text-ink-700 dark:text-paper-300">
+            Finished a book and have thoughts to share? Reader quotes are published only with permission, so get in touch and yours could appear here.
+          </p>
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <a
+              href="/connect"
+              class="action-link inline-flex items-center justify-center gap-2 rounded-lg bg-ink-900 px-5 py-3 text-sm font-semibold text-paper-50 no-underline transition-colors hover:bg-ink-800 dark:bg-paper-100 dark:text-ink-950 dark:hover:bg-paper-200"
+            >
+              Get in Touch
+              <span class="i-mdi:arrow-right text-base" aria-hidden="true"></span>
+            </a>
+            <a
+              href="/books"
+              class="inline-flex items-center justify-center gap-2 rounded-lg border border-paper-400 px-5 py-3 text-sm font-semibold text-ink-800 no-underline transition-colors hover:bg-paper-200 dark:border-ink-600 dark:text-paper-200 dark:hover:bg-ink-800"
+            >
+              Browse the Books
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</Layout>
+

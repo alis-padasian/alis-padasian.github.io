@@ -1,0 +1,231 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { Image } from "astro:assets";
+import { getReadingTimeMinutes } from "../../lib/reading-time";
+import { getEditorialStories } from "../../lib/stories";
+
+const allPosts = await getEditorialStories();
+
+// Feature the primary worldbuilding post if marked featured, or the newest post
+const featuredStory = allPosts.find((p) => p.data.featured) ?? allPosts[0];
+const archiveStories = allPosts.filter((p) => p.id !== featuredStory?.id);
+---
+
+<Layout
+  title="Behind the Stories"
+  description="Research notes, world-building lore, and creative reflections from the writing desk of fiction author Alis Padasian."
+  schemaType="CollectionPage"
+>
+  <div class="page-stack space-y-12 sm:space-y-16">
+    <!-- Header -->
+    <header class="page-header border-b border-paper-300/90 pb-6 dark:border-ink-700">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 class="page-title text-4xl font-semibold tracking-tight text-ink-950 dark:text-paper-50 sm:text-5xl">
+            Behind the Stories
+          </h1>
+          <p class="page-description mt-3 max-w-2xl text-lg text-ink-700 dark:text-paper-300">
+            Explore field notes, archival maritime charts, setting inspirations, and reflections from Alis Padasian's writing desk.
+          </p>
+        </div>
+        <div class="rounded-lg border border-paper-300/80 bg-paper-100/50 px-4 py-2 text-xs font-mono text-ink-700 dark:border-ink-700 dark:bg-ink-900/50 dark:text-paper-300">
+          <span>{allPosts.length} Editorial Dispatches</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Lead / Featured Story -->
+    {featuredStory && (
+      <section aria-labelledby="featured-story-title" class="space-y-4">
+        <div class="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-accent-700 dark:text-accent-400">
+          <span class="i-mdi:star-outline text-base" aria-hidden="true"></span>
+          <span>Featured Dispatch</span>
+        </div>
+
+        <article class="surface-card group overflow-hidden rounded-2xl border border-paper-300/90 bg-paper-50/70 p-6 transition-all hover:border-paper-400 dark:border-ink-700 dark:bg-ink-900/70 dark:hover:border-ink-500 sm:p-8">
+          <div class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+            <div class="space-y-4">
+              <div class="flex flex-wrap items-center gap-3 text-xs font-mono text-ink-600 dark:text-paper-400">
+                <time datetime={featuredStory.data.publishedAt.toISOString()}>
+                  {featuredStory.data.publishedAt.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </time>
+                <span aria-hidden="true">•</span>
+                <span>{getReadingTimeMinutes(featuredStory.body ?? "")} min read</span>
+                {featuredStory.data.tags.length > 0 && (
+                  <>
+                    <span aria-hidden="true">•</span>
+                    <span class="text-accent-700 dark:text-accent-300">
+                      {featuredStory.data.tags[0]}
+                    </span>
+                  </>
+                )}
+              </div>
+
+              <h2 id="featured-story-title" class="text-2xl font-semibold text-ink-950 dark:text-paper-50 sm:text-3xl">
+                <a
+                  href={`/stories/${featuredStory.id}`}
+                  class="no-underline transition-colors hover:text-accent-700 dark:hover:text-accent-300"
+                >
+                  {featuredStory.data.title}
+                </a>
+              </h2>
+
+              <p class="text-base text-ink-700 dark:text-paper-300 sm:text-lg">
+                {featuredStory.data.description}
+              </p>
+
+              <div class="pt-2">
+                <a
+                  href={`/stories/${featuredStory.id}`}
+                  class="action-link inline-flex items-center gap-2 rounded-lg bg-ink-900 px-5 py-2.5 text-sm font-semibold text-paper-50 no-underline transition-colors hover:bg-ink-800 dark:bg-paper-100 dark:text-ink-950 dark:hover:bg-paper-200"
+                >
+                  Read Dispatch
+                  <span class="i-mdi:arrow-right text-base" aria-hidden="true"></span>
+                </a>
+              </div>
+            </div>
+
+            {featuredStory.data.heroImage && (
+              <div class="overflow-hidden rounded-xl bg-paper-200 dark:bg-ink-800">
+                <Image
+                  src={featuredStory.data.heroImage}
+                  alt={featuredStory.data.heroImageAlt || featuredStory.data.title}
+                  format="webp"
+                  widths={[480, 800, 1200]}
+                  sizes="(min-width: 1024px) 480px, 100vw"
+                  width={featuredStory.data.heroImage.width}
+                  height={featuredStory.data.heroImage.height}
+                  class="aspect-[16/10] w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  loading="eager"
+                  fetchpriority="high"
+                />
+              </div>
+            )}
+          </div>
+        </article>
+      </section>
+    )}
+
+    <!-- Story Archive Grid -->
+    <section aria-labelledby="all-stories-title" class="space-y-6">
+      <div class="flex items-center justify-between border-b border-paper-300/80 pb-3 dark:border-ink-700">
+        <h2 id="all-stories-title" class="text-xl font-semibold text-ink-950 dark:text-paper-50">
+          World Lore & Research Notes
+        </h2>
+        <span class="text-xs font-mono text-ink-600 dark:text-paper-400">
+          {archiveStories.length} Articles
+        </span>
+      </div>
+
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {archiveStories.length === 0 && (
+          <div class="surface-card rounded-xl border border-paper-300/80 bg-paper-50/60 p-8 text-center dark:border-ink-700 dark:bg-ink-900/60 sm:col-span-2 lg:col-span-3">
+            <p class="text-sm text-ink-700 dark:text-paper-300">
+              New dispatches from the writing desk are on their way.
+            </p>
+          </div>
+        )}
+        {archiveStories.map((story) => (
+          <article class="surface-card group flex flex-col justify-between rounded-xl border border-paper-300/80 bg-paper-50/60 p-5 transition-all hover:border-paper-400 hover:shadow-sm dark:border-ink-700 dark:bg-ink-900/60 dark:hover:border-ink-500">
+            <div>
+              {story.data.heroImage && (
+                <div class="mb-4 overflow-hidden rounded-lg bg-paper-200 dark:bg-ink-800">
+                  <Image
+                    src={story.data.heroImage}
+                    alt={story.data.heroImageAlt || story.data.title}
+                    format="webp"
+                    widths={[360, 600]}
+                    sizes="(min-width: 1024px) 320px, (min-width: 640px) 50vw, 100vw"
+                    width={story.data.heroImage.width}
+                    height={story.data.heroImage.height}
+                    class="aspect-[16/10] w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                </div>
+              )}
+
+              <div class="mb-2 flex flex-wrap items-center gap-2 text-xs font-mono text-ink-600 dark:text-paper-400">
+                <time datetime={story.data.publishedAt.toISOString()}>
+                  {story.data.publishedAt.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </time>
+                <span aria-hidden="true">•</span>
+                <span>{getReadingTimeMinutes(story.body ?? "")} min</span>
+              </div>
+
+              <h3 class="text-lg font-semibold text-ink-950 dark:text-paper-50">
+                <a
+                  href={`/stories/${story.id}`}
+                  class="no-underline transition-colors hover:text-accent-700 dark:hover:text-accent-300"
+                >
+                  {story.data.title}
+                </a>
+              </h3>
+
+              <p class="mt-2 line-clamp-3 text-sm text-ink-700 dark:text-paper-300">
+                {story.data.description}
+              </p>
+            </div>
+
+            <div class="mt-5 flex items-center justify-between border-t border-paper-200 pt-3 dark:border-ink-800">
+              <div class="flex flex-wrap gap-1">
+                {story.data.tags.slice(0, 2).map((tag) => (
+                  <span class="rounded bg-paper-200/70 px-2 py-0.5 text-[11px] font-mono text-ink-700 dark:bg-ink-800 dark:text-paper-300">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <a
+                href={`/stories/${story.id}`}
+                class="inline-flex items-center gap-1 text-xs font-medium text-accent-700 no-underline hover:underline dark:text-accent-300"
+                aria-label={`Read ${story.data.title}`}
+              >
+                Read
+                <span class="i-mdi:arrow-right text-sm" aria-hidden="true"></span>
+              </a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <!-- Return & Conversion Bridge -->
+    <section class="rounded-2xl border border-paper-300/80 bg-paper-100/60 p-6 dark:border-ink-700 dark:bg-ink-900/60 sm:p-10">
+      <div class="grid gap-8 md:grid-cols-2 md:items-center">
+        <div class="space-y-3">
+          <span class="text-xs font-mono uppercase tracking-wider text-accent-700 dark:text-accent-400">
+            Experience the Stories
+          </span>
+          <h2 class="text-2xl font-semibold text-ink-950 dark:text-paper-50 sm:text-3xl">
+            From Field Notes to Full Novels
+          </h2>
+          <p class="text-sm text-ink-700 dark:text-paper-300 sm:text-base">
+            Every setting detail and historical curiosity above feeds directly into the world of <em>The Whispering Tide</em> and the broader bibliography.
+          </p>
+        </div>
+        <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+          <a
+            href="/books"
+            class="action-link inline-flex items-center justify-center gap-2 rounded-lg bg-ink-900 px-5 py-3 text-sm font-semibold text-paper-50 no-underline transition-colors hover:bg-ink-800 dark:bg-paper-100 dark:text-ink-950 dark:hover:bg-paper-200"
+          >
+            Browse Books
+            <span class="i-mdi:arrow-right text-base" aria-hidden="true"></span>
+          </a>
+          <a
+            href="/connect"
+            class="inline-flex items-center justify-center gap-2 rounded-lg border border-paper-400 px-5 py-3 text-sm font-semibold text-ink-800 no-underline transition-colors hover:bg-paper-200 dark:border-ink-600 dark:text-paper-200 dark:hover:bg-ink-800"
+          >
+            Join Reader Dispatch
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+</Layout>

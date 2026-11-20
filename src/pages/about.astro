@@ -1,0 +1,136 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PageJumpNav from "../components/PageJumpNav.astro";
+import { getCollection } from "astro:content";
+
+const [aboutEntry] = await getCollection("about");
+const data = aboutEntry.data;
+
+const pageTitle = "Meet the Author";
+const pageDescription = "Discover the storytelling vision, creative influences, and imaginative worlds of fiction author Alis Padasian.";
+
+const authorNavItems = [
+  { href: "#biography", label: "Biography" },
+  { href: "#philosophy", label: "Storytelling Vision" },
+  { href: "#themes", label: "Recurring Themes" },
+  { href: "#influences", label: "Influences" },
+];
+---
+
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  schemaType="ProfilePage"
+>
+  <div class="page-stack space-y-10 sm:space-y-12">
+    <!-- Header -->
+    <header class="page-header border-b border-paper-300/90 pb-6 dark:border-ink-700">
+      <h1 class="page-title text-4xl font-semibold tracking-tight text-ink-950 dark:text-paper-50 sm:text-5xl">
+        Meet Alis Padasian
+      </h1>
+      <p class="page-description mt-3 max-w-2xl text-lg text-ink-700 dark:text-paper-300">
+        World-builder, speculative fiction author, and explorer of forgotten coastlines.
+      </p>
+    </header>
+
+    <!-- In-Page Sticky Jump Navigation -->
+    <PageJumpNav items={authorNavItems} />
+
+    <div class="space-y-14 sm:space-y-16">
+      <!-- Section 1: Biography -->
+      <section id="biography" class="content-section scroll-mt-24 space-y-6" aria-labelledby="bio-heading">
+        <header class="border-b border-paper-300/90 pb-3 dark:border-ink-700">
+          <h2 id="bio-heading" class="section-heading text-2xl font-bold tracking-tight text-ink-950 dark:text-paper-50">
+            Biography
+          </h2>
+        </header>
+
+        <div class="prose prose-neutral max-w-none text-ink-700 dark:prose-invert">
+          <p class="text-lg leading-relaxed">{data.biography}</p>
+        </div>
+      </section>
+
+      <!-- Section 2: Storytelling Vision -->
+      <section id="philosophy" class="content-section scroll-mt-24 space-y-6" aria-labelledby="philosophy-heading">
+        <header class="border-b border-paper-300/90 pb-3 dark:border-ink-700">
+          <h2 id="philosophy-heading" class="section-heading text-2xl font-bold tracking-tight text-ink-950 dark:text-paper-50">
+            Storytelling Vision
+          </h2>
+        </header>
+
+        <div class="prose prose-neutral max-w-none text-ink-700 dark:prose-invert">
+          <p class="text-lg leading-relaxed">{data.storytellingVision}</p>
+        </div>
+      </section>
+
+      <!-- Section 3: Themes -->
+      <section id="themes" class="content-section scroll-mt-24 space-y-6" aria-labelledby="themes-heading">
+        <header class="border-b border-paper-300/90 pb-3 dark:border-ink-700">
+          <h2 id="themes-heading" class="section-heading text-2xl font-bold tracking-tight text-ink-950 dark:text-paper-50">
+            Recurring Themes & Motifs
+          </h2>
+        </header>
+
+        <div class="grid gap-5 sm:grid-cols-3">
+          {data.themes.map((theme) => (
+            <div class="surface-card rounded-xl border border-paper-300/80 p-5 dark:border-ink-700 space-y-2.5">
+              <div class="flex items-center gap-2">
+                <span class={`${theme.icon} text-accent-600 dark:text-accent-400 text-lg`} aria-hidden="true" />
+                <h3 class="font-bold text-base text-ink-950 dark:text-paper-50">{theme.title}</h3>
+              </div>
+              <p class="text-xs sm:text-sm leading-relaxed text-ink-600 dark:text-paper-300">
+                {theme.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- Section 4: Influences -->
+      <section id="influences" class="content-section scroll-mt-24 space-y-6" aria-labelledby="influences-heading">
+        <header class="border-b border-paper-300/90 pb-3 dark:border-ink-700">
+          <h2 id="influences-heading" class="section-heading text-2xl font-bold tracking-tight text-ink-950 dark:text-paper-50">
+            Creative Influences
+          </h2>
+        </header>
+
+        <div class="surface-card rounded-xl border border-paper-300/80 p-6 dark:border-ink-700">
+          <ul class="grid gap-3 sm:grid-cols-2">
+            {data.influences.map((inf) => (
+              <li class="flex items-center gap-2.5 text-sm text-ink-700 dark:text-paper-300">
+                <span class="h-2 w-2 rounded-full bg-accent-500 shrink-0" aria-hidden="true"></span>
+                <span>{inf}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <!-- Conversion Bridge to Action & Return -->
+      <section class="border-t border-paper-300/90 pt-8 dark:border-ink-700">
+        <div class="rounded-2xl border border-paper-300/90 bg-white/60 p-6 dark:border-ink-700 dark:bg-ink-900/40 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <h3 class="text-lg font-bold text-ink-950 dark:text-paper-50">Ready to enter these worlds?</h3>
+            <p class="text-sm text-ink-600 dark:text-paper-400">Discover current releases or join the reader community for release bulletins.</p>
+          </div>
+          <div class="flex flex-wrap gap-3 shrink-0">
+            <a
+              href="/books"
+              class="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-accent-700 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-accent-800 dark:bg-accent-600 dark:hover:bg-accent-500 no-underline"
+            >
+              <span>Explore Books</span>
+              <span class="i-mdi:arrow-right text-sm" aria-hidden="true" />
+            </a>
+            <a
+              href="/connect"
+              class="action-link inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-paper-300 px-4 py-2 text-xs font-semibold text-ink-900 transition-colors hover:bg-paper-100 dark:border-ink-700 dark:text-paper-100"
+            >
+              <span>The Next Chapter</span>
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</Layout>
+

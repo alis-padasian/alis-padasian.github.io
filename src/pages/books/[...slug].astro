@@ -1,0 +1,224 @@
+---
+import { getCollection, render, getEntry, type CollectionEntry } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+
+export async function getStaticPaths() {
+  const books = await getCollection("books", ({ data }) => !data.draft);
+  return books.map((book) => ({
+    params: { slug: book.id },
+    props: { book },
+  }));
+}
+
+const { book } = Astro.props as { book: CollectionEntry<"books"> };
+const { Content } = await render(book);
+const { data } = book;
+
+// Cross-collection queries
+const series = data.seriesSlug ? await getEntry("series", data.seriesSlug) : null;
+const reviews = await getCollection("reviews", ({ data: rev }) => 
+  rev.approved && !rev.draft && rev.bookSlug === book.id
+);
+
+// Series tracker: sibling volumes, so readers can move through the series in order.
+const seriesBooks = data.seriesSlug
+  ? (await getCollection("books", ({ data: b }) => !b.draft && b.seriesSlug === data.seriesSlug))
+      .filter((b) => b.id !== book.id)
+      .sort((a, b) => (a.data.seriesOrder ?? 0) - (b.data.seriesOrder ?? 0))
+  : [];
+---
+
+<Layout
+  title={`${data.title} | Books`}
+  description={data.description}
+  image={data.cover?.src}
+  imageAlt={data.coverAlt}
+>
+  <article class="page-stack space-y-8 sm:space-y-10">
+    <!-- Back to Catalog Link -->
+    <nav aria-label="Breadcrumb">
+      <a href="/books" class="action-link inline-flex items-center gap-2 text-sm px-0">
+        <span class="i-mdi:arrow-left" aria-hidden="true"></span>
+        <span>Back to Books Showcase</span>
+      </a>
+    </nav>
+
+    <!-- Header Section -->
+    <header class="border-b border-paper-300/90 pb-7 dark:border-ink-700 space-y-3">
+      {series && (
+        <p class="font-mono text-xs font-semibold uppercase tracking-wider text-accent-700 dark:text-accent-300">
+          {series.data.title} {data.seriesOrder && `· Book ${data.seriesOrder}`}
+        </p>
+      )}
+      <h1 class="page-title text-3xl font-bold tracking-tight text-ink-950 dark:text-paper-50 sm:text-5xl">
+        {data.title}
+      </h1>
+      {data.tagline && (
+        <p class="text-xl italic font-medium text-ink-800 dark:text-paper-200">
+          "{data.tagline}"
+        </p>
+      )}
+    </header>
+
+    <!-- Two-Column Layout: Main Story & Aside Details -->
+    <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-12">
+      <!-- Main Content Column -->
+      <div class="min-w-0 space-y-8">
+        <!-- Official Synopsis -->
+        <section class="space-y-4" aria-labelledby="synopsis-heading">
+          <h2 id="synopsis-heading" class="text-xl font-bold text-ink-950 dark:text-paper-50">
+            About the Story
+          </h2>
+          <p class="text-base sm:text-lg leading-relaxed text-ink-700 dark:text-paper-300">
+            {data.description}
+          </p>
+        </section>
+
+        <!-- Long-form Markdown Content -->
+        <div class="prose max-w-none text-ink-700 dark:text-paper-300 border-t border-paper-300/80 pt-6 dark:border-ink-700">
+          <Content />
+        </div>
+
+        <!-- Approved Reader Reviews Module -->
+        {reviews.length > 0 && (
+          <section aria-labelledby="reviews-heading" class="border-t border-paper-300/90 pt-8 dark:border-ink-700 space-y-4">
+            <h2 id="reviews-heading" class="text-xl font-bold text-ink-950 dark:text-paper-50">
+              Reader Praise & Reactions
+            </h2>
+            <div class="grid gap-4">
+              {reviews.map((rev) => (
+                <blockquote class="surface-card rounded-xl border border-paper-300/80 p-5 dark:border-ink-700">
+                  <p class="text-base italic text-ink-800 dark:text-paper-200">
+                    "{rev.data.quote}"
+                  </p>
+                  {rev.data.reviewerName && (
+                    <footer class="mt-2 text-xs font-semibold text-accent-700 dark:text-accent-300">
+                      — {rev.data.reviewerName}
+                    </footer>
+                  )}
+                </blockquote>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <!-- Series Tracker: keep readers moving through the series (Action loop) -->
+        {series && seriesBooks.length > 0 && (
+          <section aria-labelledby="series-tracker-heading" class="border-t border-paper-300/90 pt-8 dark:border-ink-700 space-y-4">
+            <div class="flex flex-wrap items-baseline justify-between gap-2">
+              <h2 id="series-tracker-heading" class="text-xl font-bold text-ink-950 dark:text-paper-50">
+                More from {series.data.title}
+              </h2>
+              <a href="/books" class="text-xs font-mono text-accent-700 hover:underline dark:text-accent-300">
+                View the full catalogue
+              </a>
+            </div>
+            <ul class="m-0 grid list-none gap-3 p-0 sm:grid-cols-2">
+              {seriesBooks.map((sibling) => (
+                <li class="surface-card rounded-xl border border-paper-300/80 p-4 dark:border-ink-700">
+                  <p class="m-0 font-mono text-[11px] font-semibold uppercase tracking-wider text-accent-700 dark:text-accent-300">
+                    {sibling.data.seriesOrder ? `Book ${sibling.data.seriesOrder}` : "In this series"}
+                  </p>
+                  <h3 class="mt-1 text-base font-semibold text-ink-950 dark:text-paper-50">
+                    <a href={`/books/${sibling.id}`} class="no-underline text-inherit hover:text-accent-700 dark:hover:text-accent-300">
+                      {sibling.data.title}
+                    </a>
+                  </h3>
+                  <p class="m-0 mt-1 line-clamp-2 text-xs text-ink-600 dark:text-paper-400">
+                    {sibling.data.tagline ?? sibling.data.description}
+                  </p>
+                  {sibling.data.status === "forthcoming" && (
+                    <p class="m-0 mt-2 inline-block rounded bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800 dark:bg-amber-950/60 dark:text-amber-300">
+                      Forthcoming
+                    </p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+      </div>
+
+      <!-- Sticky Sidebar: Cover & Buy Modules -->
+      <aside class="space-y-6 lg:sticky lg:top-24" aria-label="Book purchase and formats">
+        <!-- Book Cover Art Frame -->
+        <div class="flex items-center justify-center rounded-2xl bg-paper-100/80 p-6 dark:bg-ink-900/60 border border-paper-300/80 dark:border-ink-800">
+          <div class="aspect-[2/3] w-48 rounded-lg bg-gradient-to-br from-accent-700 to-accent-950 p-4 shadow-lg flex flex-col justify-between text-white text-center">
+            <span class="text-xs uppercase tracking-widest text-accent-200">Alis Padasian</span>
+            <h3 class="font-serif text-lg font-bold leading-tight">{data.title}</h3>
+            <span class="text-[10px] text-accent-300">A Novel</span>
+          </div>
+        </div>
+
+        <!-- Sample Download CTA -->
+        {data.sampleLink && (
+          <a
+            href={data.sampleLink.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-accent-700 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-800 dark:bg-accent-600 dark:hover:bg-accent-500 no-underline text-center"
+          >
+            <span class="i-mdi:book-open-page-variant text-base" aria-hidden="true"></span>
+            <span>{data.sampleLink.label}</span>
+          </a>
+        )}
+
+        <!-- Retailer Buy Links -->
+        {data.purchaseLinks.length > 0 && (
+          <div class="surface-card rounded-2xl border border-paper-300/90 p-5 dark:border-ink-700 space-y-3">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-ink-900 dark:text-paper-100">
+              Get Your Copy
+            </h3>
+            <div class="flex flex-col gap-2">
+              {data.purchaseLinks.map((link) => (
+                <a
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="action-link flex min-h-10 items-center justify-between rounded-lg border border-paper-300/90 bg-white/70 px-3.5 py-2 text-xs font-semibold text-ink-900 transition-colors hover:bg-paper-100 dark:border-ink-700 dark:bg-ink-800 dark:text-paper-100"
+                >
+                  <span>{link.label}</span>
+                  <span class="i-mdi:open-in-new text-xs" aria-hidden="true"></span>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <!-- Quick Facts / Metadata -->
+        <div class="surface-card rounded-2xl border border-paper-300/90 p-5 dark:border-ink-700 space-y-3 text-xs">
+          <h3 class="font-bold uppercase tracking-wider text-ink-900 dark:text-paper-100">
+            Book Details
+          </h3>
+          <dl class="space-y-2">
+            <div class="flex justify-between border-b border-paper-200 pb-1.5 dark:border-ink-800">
+              <dt class="text-ink-500 dark:text-paper-400">Status</dt>
+              <dd class="font-semibold text-ink-900 dark:text-paper-100 capitalize">{data.status}</dd>
+            </div>
+            {data.formats.length > 0 && (
+              <div class="flex justify-between border-b border-paper-200 pb-1.5 dark:border-ink-800">
+                <dt class="text-ink-500 dark:text-paper-400">Formats</dt>
+                <dd class="font-semibold text-ink-900 dark:text-paper-100 capitalize">
+                  {data.formats.join(", ")}
+                </dd>
+              </div>
+            )}
+            {data.genres.length > 0 && (
+              <div class="pt-1">
+                <dt class="text-ink-500 dark:text-paper-400 mb-1.5">Genres</dt>
+                <dd class="flex flex-wrap gap-1">
+                  {data.genres.map((g) => (
+                    <span class="rounded bg-paper-100 px-2 py-0.5 text-[11px] font-medium text-ink-700 dark:bg-ink-800 dark:text-paper-300">
+                      {g}
+                    </span>
+                  ))}
+                </dd>
+              </div>
+            )}
+          </dl>
+        </div>
+      </aside>
+    </div>
+  </article>
+</Layout>

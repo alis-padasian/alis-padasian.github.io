@@ -1,0 +1,138 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { Image } from "astro:assets";
+import { render, type CollectionEntry } from "astro:content";
+import { getReadingTimeMinutes } from "../../lib/reading-time";
+import { getEditorialStories } from "../../lib/stories";
+
+export async function getStaticPaths() {
+  const posts = await getEditorialStories();
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props as { post: CollectionEntry<"posts"> };
+const { Content } = await render(post);
+const readingTime = getReadingTimeMinutes(post.body ?? "");
+const heroImage = post.data.heroImage;
+---
+
+<Layout
+  title={`${post.data.title} | Behind the Stories`}
+  description={post.data.description}
+  image={heroImage?.src}
+  imageAlt={heroImage ? post.data.heroImageAlt : undefined}
+  schemaType="BlogPosting"
+  publishedAt={post.data.publishedAt}
+  modifiedAt={post.data.updatedAt}
+  tags={post.data.tags}
+>
+  <article class="page-stack space-y-10 sm:space-y-12">
+    <!-- Breadcrumb & Header -->
+    <header class="border-b border-paper-300/90 pb-8 dark:border-ink-700">
+      <nav aria-label="Breadcrumb" class="mb-4">
+        <a
+          href="/stories"
+          class="inline-flex items-center gap-1.5 text-sm font-medium text-accent-700 hover:underline dark:text-accent-300"
+        >
+          <span class="i-mdi:arrow-left text-base" aria-hidden="true"></span>
+          Back to Behind the Stories
+        </a>
+      </nav>
+
+      <div class="space-y-4">
+        <div class="flex flex-wrap items-center gap-3 text-xs font-mono text-ink-600 dark:text-paper-400">
+          <time datetime={post.data.publishedAt.toISOString()}>
+            {post.data.publishedAt.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </time>
+          <span aria-hidden="true">•</span>
+          <span>{readingTime} min read</span>
+          {post.data.tags.length > 0 && (
+            <>
+              <span aria-hidden="true">•</span>
+              <div class="flex flex-wrap gap-1.5">
+                {post.data.tags.map((tag) => (
+                  <span class="rounded bg-paper-200/80 px-2 py-0.5 text-ink-700 dark:bg-ink-800 dark:text-paper-300">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+        <h1 class="text-3xl font-semibold tracking-tight text-ink-950 dark:text-paper-50 sm:text-5xl">
+          {post.data.title}
+        </h1>
+
+        {post.data.description && (
+          <p class="max-w-3xl text-lg text-ink-700 dark:text-paper-300 sm:text-xl">
+            {post.data.description}
+          </p>
+        )}
+      </div>
+    </header>
+
+    {heroImage && (
+      <figure class="overflow-hidden rounded-xl bg-paper-100 dark:bg-ink-800">
+        <Image
+          src={heroImage}
+          alt={post.data.heroImageAlt || post.data.title}
+          format="webp"
+          widths={[480, 960, 1440]}
+          sizes="(min-width: 960px) 896px, calc(100vw - 48px)"
+          width={heroImage.width}
+          height={heroImage.height}
+          loading="eager"
+          fetchpriority="high"
+          class="aspect-[16/9] w-full object-cover"
+        />
+        {post.data.heroImageAlt && (
+          <figcaption class="mt-2 text-center text-xs text-ink-500 dark:text-paper-400">
+            {post.data.heroImageAlt}
+          </figcaption>
+        )}
+      </figure>
+    )}
+
+    <!-- Article Content -->
+    <div class="prose max-w-none dark:prose-invert">
+      <Content />
+    </div>
+
+    <!-- Author & Book Bridge -->
+    <section class="mt-12 rounded-xl border border-paper-300/80 bg-paper-100/60 p-6 dark:border-ink-700 dark:bg-ink-900/60 sm:p-8">
+      <div class="grid gap-6 sm:grid-cols-[1fr_auto] sm:items-center">
+        <div>
+          <h2 class="text-xl font-semibold text-ink-950 dark:text-paper-50">
+            From the desk of Alis Padasian
+          </h2>
+          <p class="mt-2 text-sm text-ink-700 dark:text-paper-300">
+            These notes accompany <em>The St. Jude Chronicles</em>, an atmospheric maritime mystery series exploring submerged ruins, memory, and forgotten coastlines.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <a
+            href="/books/the-whispering-tide"
+            class="action-link inline-flex items-center gap-1.5 rounded-lg bg-ink-900 px-4 py-2 text-sm font-semibold text-paper-50 no-underline hover:bg-ink-800 dark:bg-paper-100 dark:text-ink-950 dark:hover:bg-paper-200"
+          >
+            Read Book 1
+            <span class="i-mdi:arrow-right text-base" aria-hidden="true"></span>
+          </a>
+          <a
+            href="/stories"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-paper-400 px-4 py-2 text-sm font-medium text-ink-800 no-underline hover:bg-paper-200 dark:border-ink-600 dark:text-paper-200 dark:hover:bg-ink-800"
+          >
+            All Story Notes
+          </a>
+        </div>
+      </div>
+    </section>
+  </article>
+</Layout>
