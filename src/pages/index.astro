@@ -1,6 +1,11 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import PostCard from "../components/PostCard.astro";
+import BookSection from "../components/sections/BookSection.astro";
+import AuthorSection from "../components/sections/AuthorSection.astro";
+import EditorialSection from "../components/sections/EditorialSection.astro";
+import ReviewsSection from "../components/sections/ReviewsSection.astro";
+import ConnectSection from "../components/sections/ConnectSection.astro";
 import { getCollection } from "astro:content";
 import siteConfig from "../side.config";
 import { Image } from "astro:assets";
@@ -186,5 +191,9 @@ const profileAlt = siteConfig.hero.profileAlt || about.name;
       )}
       </section>
     )}
+
+    <!-- Super Homepage: Books Showcase section (mirrors /books) -->
+    <BookSection />
+
   </div>
 </Layout>

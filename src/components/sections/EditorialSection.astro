@@ -1,0 +1,65 @@
+---
+import { getEditorialStories } from "../../lib/stories";
+import { getReadingTimeMinutes } from "../../lib/reading-time";
+
+const stories = (await getEditorialStories()).slice(0, 3);
+---
+
+<div class="space-y-8 sm:space-y-10">
+  <header class="border-b border-paper-300/90 pb-6 dark:border-ink-700">
+    <h2 class="text-3xl font-semibold tracking-tight text-ink-950 dark:text-paper-50 sm:text-4xl">
+      Behind the Stories
+    </h2>
+    <p class="mt-3 max-w-2xl text-lg text-ink-700 dark:text-paper-300">
+      Field notes, archival research, and reflections from the writing desk.
+    </p>
+    <a href="/stories" class="action-link mt-4 inline-flex px-0 text-sm font-semibold">
+      Read every story note
+      <span class="i-mdi:arrow-right text-base" aria-hidden="true"></span>
+    </a>
+  </header>
+
+  {stories.length === 0 ? (
+    <div class="surface-card rounded-xl border border-paper-300/80 p-8 text-center dark:border-ink-700">
+      <p class="text-sm text-ink-700 dark:text-paper-300">
+        New dispatches from the writing desk are on their way.
+      </p>
+    </div>
+  ) : (
+    <ul class="m-0 grid list-none gap-5 p-0 sm:grid-cols-2 lg:grid-cols-3">
+      {stories.map((story) => (
+        <li class="surface-card flex flex-col justify-between rounded-xl border border-paper-300/80 p-5 dark:border-ink-700">
+          <div>
+            <div class="flex flex-wrap items-center gap-2 font-mono text-[11px] text-ink-600 dark:text-paper-400">
+              <time datetime={story.data.publishedAt.toISOString()}>
+                {story.data.publishedAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              </time>
+              <span aria-hidden="true">•</span>
+              <span>{getReadingTimeMinutes(story.body ?? "")} min read</span>
+            </div>
+
+            <h3 class="mt-2 text-lg font-semibold text-ink-950 dark:text-paper-50">
+              <a href={`/stories/${story.id}`} class="no-underline text-inherit transition-colors hover:text-accent-700 dark:hover:text-accent-300">
+                {story.data.title}
+              </a>
+            </h3>
+
+            <p class="mt-2 line-clamp-3 text-sm text-ink-700 dark:text-paper-300">
+              {story.data.description}
+            </p>
+          </div>
+
+          {story.data.tags.length > 0 && (
+            <div class="mt-4 flex flex-wrap gap-1 border-t border-paper-200 pt-3 dark:border-ink-800">
+              {story.data.tags.slice(0, 2).map((tag) => (
+                <span class="rounded bg-paper-200/70 px-2 py-0.5 font-mono text-[11px] text-ink-700 dark:bg-ink-800 dark:text-paper-300">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </li>
+      ))}
+    </ul>
+  )}
+</div>

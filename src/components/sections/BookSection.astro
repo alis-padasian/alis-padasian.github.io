@@ -1,0 +1,111 @@
+---
+import { getCollection } from "astro:content";
+
+const allBooks = (await getCollection("books", ({ data }) => !data.draft)).sort((a, b) => {
+  const dateA = a.data.publicationDate ? new Date(a.data.publicationDate).getTime() : 0;
+  const dateB = b.data.publicationDate ? new Date(b.data.publicationDate).getTime() : 0;
+  return dateB - dateA;
+});
+
+const allSeries = await getCollection("series", ({ data }) => !data.draft);
+const seriesMap = new Map(allSeries.map((s) => [s.id, s.data.title]));
+
+const featuredBook = allBooks.find((b) => b.data.featured) ?? allBooks[0];
+---
+
+<div class="space-y-10 sm:space-y-12">
+  <header class="border-b border-paper-300/90 pb-6 dark:border-ink-700">
+    <h2 class="text-3xl font-semibold tracking-tight text-ink-950 dark:text-paper-50 sm:text-4xl">
+      The Books Showcase
+    </h2>
+    <p class="mt-3 max-w-2xl text-lg text-ink-700 dark:text-paper-300">
+      Step into evocative worlds of secrets, fog-shrouded mysteries, and character-driven adventures.
+    </p>
+    <a href="/books" class="action-link mt-4 inline-flex px-0 text-sm font-semibold">
+      Visit the full Books Showcase
+      <span class="i-mdi:arrow-right text-base" aria-hidden="true"></span>
+    </a>
+  </header>
+
+  {featuredBook && (
+    <section aria-labelledby="home-featured-book-heading" class="space-y-3">
+      <div class="flex items-center justify-between">
+        <span class="inline-flex items-center gap-1.5 rounded-md border border-accent-300/60 bg-accent-50/70 px-2.5 py-1 text-xs font-semibold text-accent-800 dark:border-accent-700/50 dark:bg-accent-950/40 dark:text-accent-200">
+          <span class="i-mdi:star text-xs" aria-hidden="true"></span>
+          Recommended Gateway Title
+        </span>
+        {featuredBook.data.status === "forthcoming" && (
+          <span class="rounded-md border border-amber-300/70 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-800 dark:border-amber-700/60 dark:bg-amber-950/40 dark:text-amber-300">
+            Coming Soon
+          </span>
+        )}
+      </div>
+
+      <article class="surface-card rounded-2xl border border-paper-300/90 p-6 dark:border-ink-700 sm:p-8">
+        <div class="grid gap-6 lg:grid-cols-3">
+          <div class="space-y-4 lg:col-span-2">
+            {featuredBook.data.seriesSlug && (
+              <p class="font-mono text-xs font-semibold uppercase tracking-wider text-accent-700 dark:text-accent-300">
+                {seriesMap.get(featuredBook.data.seriesSlug) ?? featuredBook.data.seriesSlug}
+              </p>
+            )}
+
+            <h3 id="home-featured-book-heading" class="text-3xl font-bold tracking-tight text-ink-950 dark:text-paper-50 sm:text-4xl">
+              <a href={`/books/${featuredBook.id}`} class="no-underline text-inherit transition-colors hover:text-accent-700 dark:hover:text-accent-300">
+                {featuredBook.data.title}
+              </a>
+            </h3>
+            {featuredBook.data.tagline && (
+              <p class="text-lg italic font-medium text-ink-800 dark:text-paper-200">
+                "{featuredBook.data.tagline}"
+              </p>
+            )}
+
+            <p class="text-base leading-relaxed text-ink-700 dark:text-paper-300">
+              {featuredBook.data.description}
+            </p>
+
+            {featuredBook.data.genres.length > 0 && (
+              <div class="flex flex-wrap gap-1.5 pt-2">
+                {featuredBook.data.genres.map((genre) => (
+                  <span class="rounded-md border border-paper-300/80 bg-paper-100/70 px-2.5 py-0.5 text-xs font-medium text-ink-700 dark:border-ink-700 dark:bg-ink-800/60 dark:text-paper-300">
+                    {genre}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {featuredBook.data.formats.length > 0 && (
+              <div class="pt-2 text-xs text-ink-600 dark:text-paper-400">
+                <span class="font-semibold text-ink-800 dark:text-paper-200">Available Formats:</span>{" "}
+                {featuredBook.data.formats.map((f) => f.charAt(0).toUpperCase() + f.slice(1)).join(" | ")}
+              </div>
+            )}
+
+            <div class="mt-6 flex flex-wrap items-center gap-3 border-t border-paper-200 pt-3 dark:border-ink-800">
+              <a href={`/books/${featuredBook.id}`} class="inline-flex min-h-10 items-center gap-2 rounded-lg bg-accent-700 px-4 py-2 text-sm font-semibold text-white no-underline transition-colors hover:bg-accent-800 dark:bg-accent-600 dark:hover:bg-accent-500">
+                <span>Book Details</span>
+                <span class="i-mdi:arrow-right text-base" aria-hidden="true"></span>
+              </a>
+
+              {featuredBook.data.sampleLink && (
+                <a href={featuredBook.data.sampleLink.href} target="_blank" rel="noopener noreferrer" class="action-link inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-paper-300/90 bg-white/60 px-3.5 py-2 text-xs font-semibold text-ink-900 transition-colors hover:bg-paper-100 dark:border-ink-700 dark:bg-ink-800/50 dark:text-paper-100 dark:hover:bg-ink-700">
+                  <span class="i-mdi:book-open-page-variant text-sm" aria-hidden="true"></span>
+                  <span>{featuredBook.data.sampleLink.label}</span>
+                </a>
+              )}
+            </div>
+          </div>
+
+          <a href={`/books/${featuredBook.id}`} class="group flex items-center justify-center rounded-xl border border-paper-300/80 bg-paper-100/60 p-6 no-underline dark:border-ink-800 dark:bg-ink-900/60">
+            <div class="flex aspect-[2/3] w-48 flex-col justify-between rounded-lg bg-gradient-to-br from-accent-700 to-accent-950 p-4 text-center text-white shadow-md transition-transform group-hover:scale-105">
+              <span class="text-xs uppercase tracking-widest text-accent-200">Alis Padasian</span>
+              <h4 class="font-serif text-lg font-bold leading-tight">{featuredBook.data.title}</h4>
+              <span class="text-[10px] text-accent-300">View Details</span>
+            </div>
+          </a>
+        </div>
+      </article>
+    </section>
+  )}
+</div>

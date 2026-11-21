@@ -1,0 +1,55 @@
+---
+import { getCollection } from "astro:content";
+import { getPublicReviews } from "../../lib/reviews";
+
+const reviews = (await getPublicReviews()).slice(0, 3);
+const books = await getCollection("books", ({ data }) => !data.draft);
+const bookMap = new Map(books.map((book) => [book.id, book.data.title]));
+---
+
+<div class="space-y-8 sm:space-y-10">
+  <header class="border-b border-paper-300/90 pb-6 dark:border-ink-700">
+    <h2 class="text-3xl font-semibold tracking-tight text-ink-950 dark:text-paper-50 sm:text-4xl">
+      Readers' Corner
+    </h2>
+    <p class="mt-3 max-w-2xl text-lg text-ink-700 dark:text-paper-300">
+      Approved reactions from readers who have walked the fog-bound streets of St. Jude.
+    </p>
+    <a href="/readers" class="action-link mt-4 inline-flex px-0 text-sm font-semibold">
+      Browse every reader review
+      <span class="i-mdi:arrow-right text-base" aria-hidden="true"></span>
+    </a>
+  </header>
+
+  {reviews.length === 0 ? (
+    <div class="surface-card rounded-xl border border-paper-300/80 p-8 text-center dark:border-ink-700">
+      <p class="text-sm text-ink-700 dark:text-paper-300">
+        More reader reactions are on their way as new reviews are approved.
+      </p>
+    </div>
+  ) : (
+    <ul class="m-0 grid list-none gap-5 p-0 sm:grid-cols-2 lg:grid-cols-3">
+      {reviews.map((review) => (
+        <li class="surface-card flex flex-col justify-between rounded-xl border border-paper-300/80 p-5 dark:border-ink-700">
+          <div>
+            <span class="i-mdi:format-quote-open text-xl text-accent-600 dark:text-accent-400" aria-hidden="true"></span>
+            <blockquote class="m-0 mt-2 border-0 p-0">
+              <p class="text-sm leading-relaxed text-ink-800 dark:text-paper-200">{review.data.quote}</p>
+            </blockquote>
+          </div>
+
+          <footer class="mt-4 border-t border-paper-200 pt-3 text-xs font-mono text-ink-600 dark:border-ink-800 dark:text-paper-400">
+            {review.data.reviewerName && (
+              <p class="m-0 font-semibold text-ink-900 dark:text-paper-100">{review.data.reviewerName}</p>
+            )}
+            {review.data.bookSlug && bookMap.get(review.data.bookSlug) && (
+              <a href={`/books/${review.data.bookSlug}`} class="mt-1 inline-block text-accent-700 hover:underline dark:text-accent-300">
+                {bookMap.get(review.data.bookSlug)}
+              </a>
+            )}
+          </footer>
+        </li>
+      ))}
+    </ul>
+  )}
+</div>

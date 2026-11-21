@@ -1,0 +1,63 @@
+---
+import { getCollection } from "astro:content";
+
+const [aboutEntry] = await getCollection("about");
+const data = aboutEntry.data;
+---
+
+<div class="space-y-10 sm:space-y-12">
+  <header class="border-b border-paper-300/90 pb-6 dark:border-ink-700">
+    <h2 class="text-3xl font-semibold tracking-tight text-ink-950 dark:text-paper-50 sm:text-4xl">
+      Meet the Author
+    </h2>
+    <p class="mt-3 max-w-2xl text-lg text-ink-700 dark:text-paper-300">
+      World-builder, speculative fiction author, and explorer of forgotten coastlines.
+    </p>
+    <a href="/about" class="action-link mt-4 inline-flex px-0 text-sm font-semibold">
+      Read the full author profile
+      <span class="i-mdi:arrow-right text-base" aria-hidden="true"></span>
+    </a>
+  </header>
+
+  <div class="grid gap-6 lg:grid-cols-2">
+    <div class="surface-card rounded-2xl border border-paper-300/80 p-6 dark:border-ink-700">
+      <h3 class="text-lg font-bold text-ink-950 dark:text-paper-50">Biography</h3>
+      <p class="mt-2 text-sm leading-relaxed text-ink-700 dark:text-paper-300">{data.biography}</p>
+    </div>
+
+    <div class="surface-card rounded-2xl border border-paper-300/80 p-6 dark:border-ink-700">
+      <h3 class="text-lg font-bold text-ink-950 dark:text-paper-50">Storytelling Vision</h3>
+      <p class="mt-2 text-sm leading-relaxed text-ink-700 dark:text-paper-300">{data.storytellingVision}</p>
+    </div>
+  </div>
+
+  {data.themes.length > 0 && (
+    <div class="grid gap-5 sm:grid-cols-3">
+      {data.themes.map((theme) => (
+        <div class="surface-card rounded-xl border border-paper-300/80 p-5 dark:border-ink-700">
+          <div class="flex items-center gap-2">
+            <span class={`${theme.icon} text-lg text-accent-600 dark:text-accent-400`} aria-hidden="true"></span>
+            <h4 class="text-base font-bold text-ink-950 dark:text-paper-50">{theme.title}</h4>
+          </div>
+          <p class="mt-2 text-xs leading-relaxed text-ink-600 dark:text-paper-300 sm:text-sm">
+            {theme.description}
+          </p>
+        </div>
+      ))}
+    </div>
+  )}
+
+  {data.influences.length > 0 && (
+    <div class="surface-card rounded-xl border border-paper-300/80 p-6 dark:border-ink-700">
+      <h3 class="text-lg font-bold text-ink-950 dark:text-paper-50">Creative Influences</h3>
+      <ul class="mt-3 grid gap-2 sm:grid-cols-2">
+        {data.influences.map((influence) => (
+          <li class="flex items-center gap-2.5 text-sm text-ink-700 dark:text-paper-300">
+            <span class="h-2 w-2 shrink-0 rounded-full bg-accent-500" aria-hidden="true"></span>
+            <span>{influence}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+</div>
