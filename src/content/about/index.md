@@ -19,7 +19,7 @@ headline: "Sabah-based author. A rebel at heart. "
 subheadline: Mira Latticewell is an entirely fictional scholar created to
   demonstrate this academic portfolio theme.
 statusBadge: Fictional demo profile
-profileImage: /profile.svg
+profileImage: ./images/gambo-alis-timeless.jpg
 socialLinks: "[object Object],[object Object],[object Object]"
 affiliations: "[object Object]"
 researchInterests: Horror,Nostalgia
