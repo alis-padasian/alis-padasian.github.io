@@ -39,7 +39,9 @@ export default {
   ],
   navLinks: [
     { href: "/about", label: "About" },
-    { href: "/posts", label: "Behind the Stories" }
+    { href: "/books", label: "Books" },
+    { href: "/posts", label: "Posts" },
+    { href: "/connect", label: "Connect" }
   ],
   footer: {
     copyright: "© 2026 Alis Padasian",
