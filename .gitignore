@@ -25,6 +25,13 @@ pnpm-debug.log*
 .env
 .env.production
 
+# secrets & api keys — never commit these
+*.key
+*api key*
+*api_key*
+*cms dan*
+cms dan api key.txt
+
 # macOS-specific files
 .DS_Store
 
