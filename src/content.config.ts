@@ -187,7 +187,27 @@ const about = defineCollection({
             description: text,
             icon: text
         })).default([]),
-        influences: z.array(text).default([])
+        influences: z.array(text).default([]),
+        author: text.optional(),
+        currentRole: text.optional(),
+        researchAreas: text.optional(),
+        education: text.optional(),
+        headline: text.optional(),
+        subheadline: text.optional(),
+        statusBadge: text.optional(),
+        profileImage: text.optional(),
+        socialLinks: z.array(z.object({
+            label: text,
+            href: z.string(),
+            icon: text.optional()
+        })).default([]),
+        affiliations: z.array(z.object({
+            role: text,
+            department: text.optional(),
+            institution: text,
+            url: text.optional()
+        })).default([]),
+        researchInterests: z.array(text).default([])
     })
 });
 
