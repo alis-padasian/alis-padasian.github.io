@@ -1,0 +1,27 @@
+I'm not sure how to express this. But how do I change these things?:
+
+That "Mira Latticewell" is still there both on the sticky header and homepage. How do I change that?
+
+Then, I think there's no easy way to put this. On the .index (or is it homepage?) Why do these things are still there?:
+
+"Fictional Associate Professor, School of Imaginary Systems, Northstar Commons University (fictional)"
+
+"Fictional research on learning systems, shared archives, and humane web infrastructure."
+
+"Sample repository" [Can we change this to social media link?]
+
+"Sample notes" [Can we change this to social media link?]
+
+"Sample archive" [Can we change this to social media link?]
+
+"Fictional demo profile"
+
+"Mira Latticewell is an entirely fictional scholar created to demonstrate this academic portfolio theme."
+
+"Synthetic Learning Environments"
+
+"Speculative Interfaces"
+
+"Fictional Archives"
+
+"Imaginary Civic Systems"

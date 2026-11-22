@@ -7,7 +7,7 @@ import EditorialSection from "../components/sections/EditorialSection.astro";
 import ReviewsSection from "../components/sections/ReviewsSection.astro";
 import ConnectSection from "../components/sections/ConnectSection.astro";
 import { getCollection } from "astro:content";
-import siteConfig from "../side.config";
+import siteConfig from "../config/site.ts";
 import { Image } from "astro:assets";
 
 const showHero = siteConfig.homeBlocks.hero.enabled;

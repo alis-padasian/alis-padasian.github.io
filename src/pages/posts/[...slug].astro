@@ -4,7 +4,7 @@ import { Image } from 'astro:assets';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import { getReadingTimeMinutes } from '../../lib/reading-time';
 import { buildCanonicalUrl } from '../../lib/site-url';
-import siteConfig from '../../side.config';
+import siteConfig from "../../config/site.ts";
 
 export async function getStaticPaths() {
 	const posts = (await getCollection('posts')).filter((post) => !post.data.draft);

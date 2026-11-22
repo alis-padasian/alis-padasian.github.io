@@ -1,0 +1,11 @@
+Wow! The website is astoundingly great!
+
+However, the homepage needs retweaking. Can you take all those five core content collections, put it on the homepage, right under the "Latest Posts"? 
+
+I'm not asking you to remove those pages (/books, /about, /stories, /readers, /connect). No. Keep that pages. No need to change anything. Not even the structures or slugs. No touching it.
+
+What I want you to do is duplicate those five core content collections then put it on the homepage. Exact duplicates. Even the order too follows the exact structures.
+
+That way, I kept on the attention span similar to scrolling social media.
+
+Do you get what I meant? Clarify first what you have understood.

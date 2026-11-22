@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import siteConfig from "../side.config";
+import siteConfig from "../config/site.ts";
 import { withTrailingSlash } from "../lib/site-url";
 
 export const prerender = true;

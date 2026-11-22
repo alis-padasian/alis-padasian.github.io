@@ -2,7 +2,7 @@
 import Layout from "../../layouts/Layout.astro";
 import PostCard from "../../components/PostCard.astro";
 import { getCollection } from "astro:content";
-import siteConfig from "../../side.config";
+import siteConfig from "../../config/site.ts";
 
 const posts = (await getCollection("posts"))
   .filter((post) => !post.data.draft)

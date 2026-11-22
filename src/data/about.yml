@@ -1,15 +1,36 @@
-# Edit the /about records here; edit its page title and introduction in site.config.ts.
-# Delete a top-level list (or set it to []) to hide that block. Empty sections stay hidden.
-# Keep every field shown in profile, experience, education, and structured service records.
+﻿# Author Profile & Site Identity`n# This file contains all your editable profile information via PagesCMS`n`# Edit fields here and the homepage/sticky header will update automatically`n
 
-profile:
+# Profile
   - label: Current Role
     value: Fictional Associate Professor, School of Imaginary Systems
   - label: Research Areas
     value: Synthetic learning environments, fictional archives, speculative interfaces
   - label: Education
     value: Ph.D., Speculative Informatics, 2021 (fictional)
+  - label: Profile Image
+    value: /profile.svg
+  - label: Social Links
+    value: []
 
+# Hero
+  - label: Headline
+    value: Fictional research on learning systems, shared archives, and humane web infrastructure.
+  - label: Subheadline
+    value: Mira Latticewell is an entirely fictional scholar created to demonstrate this academic portfolio theme.
+  - label: Status Badge
+    value: Fictional demo profile
+
+# Affiliations
+  - role: Fictional Associate Professor
+    department: School of Imaginary Systems
+    institution: Northstar Commons University (fictional)
+
+# Research Interests
+  - Synthetic Learning Environments
+  - Speculative Interfaces
+  - Fictional Archives
+  - Imaginary Civic Systems
+# --- Keep existing about sections below (Education, Experience, etc.) ---
 
 experience:
   - role: Fictional Associate Professor
@@ -44,8 +65,6 @@ service:
   - Editorial Board - Journal of Imaginary Learning Systems (fictional)
   - Organizer - Synthetic Archives Workshop (fictional)
 
-# The first custom section sits beside Service on wide screens; later sections follow below.
-# An item may be plain text or a detailed record; add a title when it needs a heading.
 sections:
   - title: Awards
     icon: i-mdi:trophy-award
