@@ -14,12 +14,12 @@ influences: Classical Gothic & Historical Mystery Fiction,Maritime Folklore,
 currentRole: Also known as Jinjulis, J.J. Padasian where J, is my father
   (Jameson) and Padasian (grandpa).
 researchAreas: Synthetic learning environments, fictional archives, speculative interfaces
-education: Ph.D., Speculative Informatics, 2021 (fictional)
+education: Ph.D., Speculative Informatics, 2006 (fictional)
 headline: "Sabah-based author. A rebel at heart. "
 subheadline: Mira Latticewell is an entirely fictional scholar created to
   demonstrate this academic portfolio theme.
 statusBadge: Fictional demo profile
-profileImage: ./images/gambo-alis-timeless.jpg
+profileImage: images/gambo-alis-timeless.jpg
 socialLinks: "[object Object],[object Object],[object Object]"
 affiliations: "[object Object]"
 researchInterests: Horror,Nostalgia
