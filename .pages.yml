@@ -22,8 +22,9 @@ media:
 content:
   - name: about
     label: About Page
-    type: collection
-    path: src/content/about
+    type: file
+    path: src/content/about/index.md
+    format: yaml-frontmatter
     fields:
       - { name: biography, label: Biography, type: text, required: true }
       - { name: storytellingVision, label: Storytelling Vision, type: text, required: true }
